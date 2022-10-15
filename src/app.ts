@@ -1,8 +1,8 @@
 class ProjectInput {
+    static instance: ProjectInput
     templateElement: HTMLTemplateElement
     hostElement: HTMLDivElement
     element: HTMLFormElement
-    public static instance: ProjectInput 
 
     private constructor() {
         this.templateElement = <HTMLTemplateElement>document.getElementById('project-input')!
@@ -10,11 +10,8 @@ class ProjectInput {
 
         const importedNode = document.importNode(this.templateElement.content, true)
         this.element = importedNode.firstElementChild as HTMLFormElement 
+        this.element.id = 'user-input'
         this.attach()
-    }
-
-    private attach() {
-        this.hostElement.insertAdjacentElement('afterbegin', this.element)
     }
 
     static getInstance() {
@@ -24,7 +21,10 @@ class ProjectInput {
         ProjectInput.instance = new ProjectInput()
         return ProjectInput.instance
     }
+
+    private attach() {
+        this.hostElement.insertAdjacentElement('afterbegin', this.element)
+    }
 }
 
-const prjInput1 = ProjectInput.getInstance() // this instance
-const prjInput2 = ProjectInput.getInstance() // is the same instance as this one
+const prjInput = ProjectInput.getInstance()
