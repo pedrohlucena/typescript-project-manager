@@ -1,6 +1,5 @@
 function AutoBind(_: any, _2: string, descriptor: PropertyDescriptor) {
     const originalMethod = descriptor.value
-    console.log(descriptor)
     const adjDescriptor: PropertyDescriptor = {
         configurable: true,
         enumerable: false,
@@ -9,9 +8,10 @@ function AutoBind(_: any, _2: string, descriptor: PropertyDescriptor) {
             return boundFunction
         }
     }
-    console.log(adjDescriptor)
     return adjDescriptor
 }
+
+type UserInput = [string, string, number]
 class ProjectInput {
     static instance: ProjectInput
 
@@ -26,10 +26,10 @@ class ProjectInput {
 
     private constructor() {
         this.templateElement = <HTMLTemplateElement>document.getElementById('project-input')!
-        this.hostElement = <HTMLDivElement>document.getElementById('app')! 
+        this.hostElement = <HTMLDivElement>document.getElementById('app')!
 
         const importedNode = document.importNode(this.templateElement.content, true)
-        this.formElement = importedNode.firstElementChild as HTMLFormElement 
+        this.formElement = importedNode.firstElementChild as HTMLFormElement
         this.formElement.id = 'user-input'
 
         this.titleInputElement = this.formElement.querySelector('#title') as HTMLInputElement
@@ -41,7 +41,7 @@ class ProjectInput {
     }
 
     static getInstance() {
-        if(ProjectInput.instance) {
+        if (ProjectInput.instance) {
             return ProjectInput.instance
         }
         ProjectInput.instance = new ProjectInput()
@@ -52,10 +52,38 @@ class ProjectInput {
         this.hostElement.insertAdjacentElement('afterbegin', this.formElement)
     }
 
+    private gatherUserInput(): UserInput | void {
+        const enteredTitle = this.titleInputElement.value
+        const enteredDescription = this.descriptionInputElement.value
+        const enteredPeople = parseInt(this.peopleInputElement.value)
+
+        if (
+            enteredTitle.trim().length === 0 ||
+            enteredDescription.trim().length === 0 ||
+            0 > enteredPeople
+        ) {
+            alert('Invalid input, please try again')
+            return
+        } else {
+            return [enteredTitle, enteredDescription, enteredPeople]
+        }
+    }
+
+    private clearInputs() {
+        this.titleInputElement.value = ""
+        this.descriptionInputElement.value = ""
+        this.peopleInputElement.value = ""
+    }
+
     @AutoBind
     private submitHandler(event: Event) {
         event.preventDefault()
-        console.log(this.titleInputElement.value)
+        const userInput = this.gatherUserInput()
+        if (Array.isArray(userInput)) {
+            const [title, description, people] = userInput
+            console.log(title, description, people)
+            this.clearInputs()
+        }
     }
 
     private configure() {
