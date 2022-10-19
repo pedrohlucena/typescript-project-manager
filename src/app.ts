@@ -13,16 +13,7 @@ function AutoBind(_: any, _2: string, descriptor: PropertyDescriptor) {
 
 type UserInput = [string, string, number]
 
-interface Validatable {
-    value: string | number,
-    required?: boolean,
-    minLength?: number,
-    maxLength?: number,
-    maxValue?: number,
-    minValue?: number
-}
-
-function validate(validatableInput: Validatable): boolean {
+function validate(validatableInput: ValidatableInput): boolean {
     let isValid = true
     const valueToValidate = validatableInput.value
 
@@ -59,6 +50,23 @@ function validate(validatableInput: Validatable): boolean {
     }
 
     return isValid
+}
+class ValidatableInput {
+    value: string | number
+    required?: boolean
+    minLength?: number
+    maxLength?: number
+    minValue?: number
+    maxValue?: number
+
+    constructor(value: string | number, required?: boolean, minLength?: number, maxLength?: number, minValue?: number, maxValue?: number) {
+        this.value = value
+        this.required = required
+        this.minLength = minLength
+        this.maxLength = maxLength
+        this.minValue = minValue
+        this.maxValue = maxValue
+    }
 }
 
 class ProjectInput {
