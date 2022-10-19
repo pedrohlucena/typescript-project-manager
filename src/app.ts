@@ -12,6 +12,55 @@ function AutoBind(_: any, _2: string, descriptor: PropertyDescriptor) {
 }
 
 type UserInput = [string, string, number]
+
+interface Validatable {
+    value: string | number,
+    required?: boolean,
+    minLength?: number,
+    maxLength?: number,
+    maxValue?: number,
+    minValue?: number
+}
+
+function validate(validatableInput: Validatable): boolean {
+    let isValid = true
+    const valueToValidate = validatableInput.value
+
+    const minimalLength = validatableInput.minLength
+    const maximalLength = validatableInput.maxLength
+
+    const minValue = validatableInput.minValue
+    const maxValue = validatableInput.maxValue
+
+    if(validatableInput.required) {
+            isValid = isValid && valueToValidate.toString().trim().length !== 0
+    }
+
+    if(typeof valueToValidate === 'string') {
+        if(minimalLength != null || maximalLength != null) {
+            if(minimalLength) {
+                isValid = isValid && valueToValidate.length >= minimalLength
+            }
+            if(maximalLength) {
+                isValid = isValid && maximalLength >= valueToValidate.length
+            }
+        }
+    }
+
+    if(typeof valueToValidate === 'number') {
+        if(minValue != null || maxValue != null) {
+            if(minValue) {
+                isValid = isValid && valueToValidate >= minValue
+            }
+            if(maxValue) {
+                isValid = isValid && maxValue >= valueToValidate
+            }
+        }
+    }
+
+    return isValid
+}
+
 class ProjectInput {
     static instance: ProjectInput
 
