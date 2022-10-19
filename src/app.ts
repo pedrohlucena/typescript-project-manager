@@ -13,7 +13,7 @@ function AutoBind(_: any, _2: string, descriptor: PropertyDescriptor) {
 
 type UserInput = [string, string, number]
 
-function validate(validatableInput: ValidatableInput): boolean {
+function validate(validatableInput: Validatable): boolean {
     let isValid = true
     const valueToValidate = validatableInput.value
 
@@ -51,6 +51,15 @@ function validate(validatableInput: ValidatableInput): boolean {
 
     return isValid
 }
+interface Validatable {
+    value: string | number,
+    required?: boolean,
+    minLength?: number,
+    maxLength?: number,
+    maxValue?: number,
+    minValue?: number
+}
+
 class ValidatableInput {
     value: string | number
     required?: boolean
@@ -114,15 +123,19 @@ class ProjectInput {
         const enteredDescription = this.descriptionInputElement.value
         const enteredPeople = parseInt(this.peopleInputElement.value)
 
+        const titleValidatable: Validatable = {value: enteredTitle, required: true}
+        const descriptionValidatable: Validatable = {value: enteredDescription, required: true, minLength: 5}
+        const peopleValidatable: Validatable = {value: enteredPeople, required: true, minValue: 0, maxValue: 10}
+
         if (
-            enteredTitle.trim().length === 0 ||
-            enteredDescription.trim().length === 0 ||
-            0 > enteredPeople
+            validate(titleValidatable) &&
+            validate(descriptionValidatable) &&
+            validate(peopleValidatable)
         ) {
+            return [enteredTitle, enteredDescription, enteredPeople]
+        } else {
             alert('Invalid input, please try again')
             return
-        } else {
-            return [enteredTitle, enteredDescription, enteredPeople]
         }
     }
 
