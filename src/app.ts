@@ -17,39 +17,37 @@ function validate(validatableInput: Validatable): boolean {
     let isValid = true
     const valueToValidate = validatableInput.value
 
-    const minimalLength = validatableInput.minLength
-    const maximalLength = validatableInput.maxLength
-
-    const minValue = validatableInput.minValue
-    const maxValue = validatableInput.maxValue
-
-    if(validatableInput.required) {
-            isValid = isValid && valueToValidate.toString().trim().length !== 0
+    if (validatableInput.required) {
+        isValid = isValid && valueToValidate.toString().trim().length !== 0;
+    }
+    if (
+        validatableInput.minLength != null &&
+        typeof valueToValidate === 'string'
+    ) {
+        isValid =
+            isValid && valueToValidate.length >= validatableInput.minLength;
+    }
+    if (
+        validatableInput.maxLength != null &&
+        typeof valueToValidate === 'string'
+    ) {
+        isValid =
+            isValid && valueToValidate.length <= validatableInput.maxLength;
+    }
+    if (
+        validatableInput.minValue != null &&
+        typeof valueToValidate === 'number'
+    ) {
+        isValid = isValid && valueToValidate >= validatableInput.minValue;
+    }
+    if (
+        validatableInput.maxValue != null &&
+        typeof valueToValidate === 'number'
+    ) {
+        isValid = isValid && valueToValidate <= validatableInput.maxValue;
     }
 
-    if(typeof valueToValidate === 'string') {
-        if(minimalLength != null || maximalLength != null) {
-            if(minimalLength) {
-                isValid = isValid && valueToValidate.length >= minimalLength
-            }
-            if(maximalLength) {
-                isValid = isValid && maximalLength >= valueToValidate.length
-            }
-        }
-    }
-
-    if(typeof valueToValidate === 'number') {
-        if(minValue != null || maxValue != null) {
-            if(minValue) {
-                isValid = isValid && valueToValidate >= minValue
-            }
-            if(maxValue) {
-                isValid = isValid && maxValue >= valueToValidate
-            }
-        }
-    }
-
-    return isValid
+    return isValid;
 }
 interface Validatable {
     value: string | number,
@@ -123,9 +121,9 @@ class ProjectInput {
         const enteredDescription = this.descriptionInputElement.value
         const enteredPeople = parseInt(this.peopleInputElement.value)
 
-        const titleValidatable: Validatable = {value: enteredTitle, required: true}
-        const descriptionValidatable: Validatable = {value: enteredDescription, required: true, minLength: 5}
-        const peopleValidatable: Validatable = {value: enteredPeople, required: true, minValue: 0, maxValue: 10}
+        const titleValidatable: Validatable = { value: enteredTitle, required: true }
+        const descriptionValidatable: Validatable = { value: enteredDescription, required: true, minLength: 5 }
+        const peopleValidatable: Validatable = { value: enteredPeople, required: true, minValue: 0, maxValue: 10 }
 
         if (
             validate(titleValidatable) &&
