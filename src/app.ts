@@ -58,23 +58,6 @@ interface Validatable {
     minValue?: number
 }
 
-class ValidatableInput {
-    value: string | number
-    required?: boolean
-    minLength?: number
-    maxLength?: number
-    minValue?: number
-    maxValue?: number
-
-    constructor(value: string | number, required?: boolean, minLength?: number, maxLength?: number, minValue?: number, maxValue?: number) {
-        this.value = value
-        this.required = required
-        this.minLength = minLength
-        this.maxLength = maxLength
-        this.minValue = minValue
-        this.maxValue = maxValue
-    }
-}
 
 class ProjectInput {
     static instance: ProjectInput
