@@ -58,7 +58,37 @@ interface Validatable {
     minValue?: number
 }
 
+class ProjectList { 
+    templateElement: HTMLTemplateElement
+    hostElement: HTMLDivElement
+    sectionElement: HTMLElement
 
+    constructor(private type: "active" | "finished") {
+        this.templateElement = <HTMLTemplateElement>document.getElementById('project-list')!
+        this.hostElement = <HTMLDivElement>document.getElementById('app')!
+
+        const importedNode = document.importNode(this.templateElement.content, true)
+        this.sectionElement = <HTMLElement>importedNode.firstElementChild
+        this.sectionElement.id = `${this.type}-projects`
+
+        this.attach()
+        this.renderListTitle()
+    }
+
+    private renderListTitle() {
+        const listId = `${this.type}-projects-list`
+        this.sectionElement.querySelector('ul')!.id = listId
+
+        const projectListTitleElement = this.sectionElement.querySelector('h2')!
+        this.type === "active"  
+            ? projectListTitleElement.innerHTML = "Active projects"   
+            : projectListTitleElement.innerHTML = "Finished projects"
+    }
+
+    private attach() {
+        this.hostElement.insertAdjacentElement('beforeend', this.sectionElement)
+    }
+}
 class ProjectInput {
     static instance: ProjectInput
 
@@ -76,12 +106,12 @@ class ProjectInput {
         this.hostElement = <HTMLDivElement>document.getElementById('app')!
 
         const importedNode = document.importNode(this.templateElement.content, true)
-        this.formElement = importedNode.firstElementChild as HTMLFormElement
+        this.formElement = <HTMLFormElement>importedNode.firstElementChild
         this.formElement.id = 'user-input'
 
-        this.titleInputElement = this.formElement.querySelector('#title') as HTMLInputElement
-        this.descriptionInputElement = this.formElement.querySelector('#description') as HTMLInputElement
-        this.peopleInputElement = this.formElement.querySelector('#people') as HTMLInputElement
+        this.titleInputElement = <HTMLInputElement>this.formElement.querySelector('#title')
+        this.descriptionInputElement = <HTMLInputElement>this.formElement.querySelector('#description')
+        this.peopleInputElement = <HTMLInputElement>this.formElement.querySelector('#people')
 
         this.configure()
         this.attach()
@@ -143,3 +173,6 @@ class ProjectInput {
 }
 
 const prjInput = ProjectInput.getInstance()
+
+const prjList1 = new ProjectList("active")
+const prjList2 = new ProjectList("finished")
