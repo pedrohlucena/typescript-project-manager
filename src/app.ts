@@ -1,3 +1,38 @@
+class ProjectState {
+    private listeners: any = []
+    private projects: Array<any> = []
+    private static instance: ProjectState
+
+    private constructor() {}
+
+    addProject(title: string, description: string, people: number) {
+        this.projects.push({
+            id: Math.random.toString(),
+            title, 
+            description, 
+            people
+        })
+
+        for (const listenerFn of this.listeners) {
+            listenerFn(this.projects.slice())
+        }
+    }
+
+    addListener(listenerFn: Function) {
+        this.listeners.push(listenerFn)
+    }
+
+    static getInstance() {
+        if(ProjectState.instance) {
+            return ProjectState.instance
+        }
+        this.instance = new ProjectState()
+        return this.instance
+    }
+}
+
+const projectState = ProjectState.getInstance()
+
 function AutoBind(_: any, _2: string, descriptor: PropertyDescriptor) {
     const originalMethod = descriptor.value
     const adjDescriptor: PropertyDescriptor = {
@@ -162,6 +197,7 @@ class ProjectInput {
         const userInput = this.gatherUserInput()
         if (Array.isArray(userInput)) {
             const [title, description, people] = userInput
+            projectState.addProject(title, description, people)
             console.log(title, description, people)
             this.clearInputs()
         }
@@ -174,5 +210,5 @@ class ProjectInput {
 
 const prjInput = ProjectInput.getInstance()
 
-const prjList1 = new ProjectList("active")
-const prjList2 = new ProjectList("finished")
+const activePrjList = new ProjectList("active")
+const finishedPrjList = new ProjectList("finished")
