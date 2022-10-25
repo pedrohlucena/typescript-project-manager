@@ -9,13 +9,21 @@ class Project {
     ) {}
 }
 
-type Listener = (items: Array<Project>) => void
-class ProjectState {
-    private listeners: Array<Listener> = []
+type Listener<T> = (items: Array<T>) => void
+
+class State<T> {
+    protected listeners: Array<Listener<T>> = []
+
+    addListener(listenerFn: Listener<T>) {
+        this.listeners.push(listenerFn)
+    }
+}
+class ProjectState extends State<Project> {
+
     private projects: Array<Project> = []
     private static instance: ProjectState
 
-    private constructor() {}
+    private constructor() { super() }
 
     addProject(title: string, description: string, people: number) {
         const project = new Project(
@@ -30,10 +38,6 @@ class ProjectState {
         for (const listenerFn of this.listeners) {
             listenerFn(this.projects.slice())
         }
-    }
-
-    addListener(listenerFn: Listener) {
-        this.listeners.push(listenerFn)
     }
 
     static getInstance() {
