@@ -138,7 +138,7 @@ abstract class Component<T extends HTMLElement, U extends HTMLElement> {
     }
 
     abstract configure(): void
-    abstract renderContent?(): void
+    abstract renderContent(): void
 }
 
 class ProjectList extends Component<HTMLDivElement, HTMLElement> { 
@@ -167,13 +167,9 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement> {
 
         listElement.innerHTML = ''
 
-        let listItem: HTMLLIElement
-
         for(const project of this.assignedProjects) {
-            listItem = document.createElement('li')
-            listItem.textContent = project.title
-            listElement.appendChild(listItem)
-        }
+            new ProjectItem(this.element.querySelector('ul')!.id, project)
+        } 
     }
 
     configure() {
@@ -190,6 +186,26 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement> {
         })
     }
 
+}
+
+class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> {
+    private project: Project
+
+    constructor(hostId: string, project: Project) {
+        super('single-project', hostId, 'beforeend', project.id)
+        this.project = project
+
+        this.configure()
+        this.renderContent()
+    }
+
+    renderContent() {
+        this.element.querySelector('h2')!.textContent = this.project.title
+        this.element.querySelector('h3')!.textContent = `${this.project.people.toString()} people`
+        this.element.querySelector('p')!.textContent = this.project.description
+    }
+    
+    configure() {}
 }
 class ProjectInput extends Component<HTMLDivElement, HTMLFormElement> {
     static instance: ProjectInput
