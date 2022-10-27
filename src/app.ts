@@ -191,6 +191,14 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement> {
 class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> {
     private project: Project
 
+    get persons() {
+        const peopleQuantity = this.project.people
+        if (this.project.people === 1) {
+            return '1 person'
+        }
+        return `${peopleQuantity} people`
+    }
+
     constructor(hostId: string, project: Project) {
         super('single-project', hostId, 'beforeend', project.id)
         this.project = project
@@ -201,7 +209,7 @@ class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> {
 
     renderContent() {
         this.element.querySelector('h2')!.textContent = this.project.title
-        this.element.querySelector('h3')!.textContent = `${this.project.people.toString()} people`
+        this.element.querySelector('h3')!.textContent = `${this.persons} assigned.`
         this.element.querySelector('p')!.textContent = this.project.description
     }
     
