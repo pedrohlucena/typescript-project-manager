@@ -1,3 +1,14 @@
+interface Draggable {
+    dragStartHandler(event: DragEvent): void
+    dragEndHandler(event: DragEvent): void
+}
+
+interface DragTarget {
+    dragOverHandler(event: DragTarget): void
+    dropHandler(event: DragTarget): void
+    dragLeavleHandler(event: DragTarget): void
+}
+
 enum ProjectStatus { Active, Finished }
 class Project {
     constructor(
@@ -188,7 +199,8 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement> {
 
 }
 
-class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> {
+class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> 
+    implements Draggable {
     private project: Project
 
     get persons() {
@@ -207,13 +219,28 @@ class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> {
         this.renderContent()
     }
 
+    @AutoBind
+    dragStartHandler(event: DragEvent) {
+        console.log(event)
+    }
+    
+    @AutoBind
+    dragEndHandler(_: DragEvent) {
+        console.log('dragend')
+    }
+
+    configure() {
+        this.element.addEventListener('dragstart', this.dragStartHandler)
+        this.element.addEventListener('dragend', this.dragEndHandler)
+    }
+
     renderContent() {
         this.element.querySelector('h2')!.textContent = this.project.title
         this.element.querySelector('h3')!.textContent = `${this.persons} assigned.`
         this.element.querySelector('p')!.textContent = this.project.description
     }
     
-    configure() {}
+
 }
 class ProjectInput extends Component<HTMLDivElement, HTMLFormElement> {
     static instance: ProjectInput
