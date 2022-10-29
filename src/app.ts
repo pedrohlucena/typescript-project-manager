@@ -4,9 +4,9 @@ interface Draggable {
 }
 
 interface DragTarget {
-    dragOverHandler(event: DragTarget): void
-    dropHandler(event: DragTarget): void
-    dragLeavleHandler(event: DragTarget): void
+    dragOverHandler(event: DragEvent): void
+    dropHandler(event: DragEvent): void
+    dragLeaveHandler(event: DragEvent): void
 }
 
 enum ProjectStatus { Active, Finished }
@@ -152,7 +152,8 @@ abstract class Component<T extends HTMLElement, U extends HTMLElement> {
     abstract renderContent(): void
 }
 
-class ProjectList extends Component<HTMLDivElement, HTMLElement> { 
+class ProjectList extends Component<HTMLDivElement, HTMLElement> 
+    implements DragTarget { 
     assignedProjects: Array<Project>
     
     constructor(private type: "active" | "finished") {
@@ -163,16 +164,33 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement> {
         this.renderContent()
     }
     
+    @AutoBind
+    dragOverHandler(_: DragEvent)  {
+        const listElement = this.element.querySelector('ul')!
+        listElement.classList.add('droppable')
+    }
+
+    dropHandler(_: DragEvent) {
+
+    } 
+
+    @AutoBind
+    dragLeaveHandler(_: DragEvent) {
+        const listElement = this.element.querySelector('ul')!
+        listElement.classList.remove('droppable')
+    }
+
     renderContent() {
         const listId = `${this.type}-projects-list`
         this.element.querySelector('ul')!.id = listId
-    
+        
         const projectListTitleElement = this.element.querySelector('h2')!
         this.type === "active"  
-            ? projectListTitleElement.innerHTML = "Active projects"   
-            : projectListTitleElement.innerHTML = "Finished projects"
+        ? projectListTitleElement.innerHTML = "Active projects"   
+        : projectListTitleElement.innerHTML = "Finished projects"
     }
-
+    
+    
     private renderProjects() {
         const listElement = <HTMLUListElement>document.getElementById(`${this.type}-projects-list`)!
 
@@ -184,6 +202,10 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement> {
     }
 
     configure() {
+        this.element.addEventListener('dragover', this.dragOverHandler)
+        this.element.addEventListener('dragleave', this.dragLeaveHandler)
+        // this.element.addEventListener('drop', this.dropHandler)
+
         projectState.addListener((projects: Array<Project>) => {
             const relevantProjects = projects.filter(project => {
                 if(this.type === 'active') {
@@ -224,7 +246,6 @@ class ProjectItem extends Component<HTMLUListElement, HTMLLIElement>
         console.log(event)
     }
     
-    @AutoBind
     dragEndHandler(_: DragEvent) {
         console.log('dragend')
     }
