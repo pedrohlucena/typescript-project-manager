@@ -36,9 +36,17 @@ class ProjectState extends State<Project> {
 
     private constructor() { super() }
 
+    static getInstance() {
+        if(ProjectState.instance) {
+            return ProjectState.instance
+        }
+        this.instance = new ProjectState()
+        return this.instance
+    }
+
     addProject(title: string, description: string, people: number) {
         const project = new Project(
-            Math.random.toString(), 
+            Math.random().toString(), 
             title, description, 
             people, 
             ProjectStatus.Active
@@ -51,12 +59,8 @@ class ProjectState extends State<Project> {
         }
     }
 
-    static getInstance() {
-        if(ProjectState.instance) {
-            return ProjectState.instance
-        }
-        this.instance = new ProjectState()
-        return this.instance
+    getProjects() {
+        return this.projects
     }
 }
 
@@ -165,13 +169,32 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement>
     }
     
     @AutoBind
-    dragOverHandler(_: DragEvent)  {
-        const listElement = this.element.querySelector('ul')!
-        listElement.classList.add('droppable')
+    dragOverHandler(event: DragEvent)  {
+        if(event.dataTransfer && event.dataTransfer.types[0] === 'text/plain') {
+            event.preventDefault()
+            const listElement = this.element.querySelector('ul')!
+            listElement.classList.add('droppable')
+        }
     }
 
-    dropHandler(_: DragEvent) {
+    @AutoBind
+    dropHandler(event: DragEvent) {
+        const projectId = event.dataTransfer!.getData('text/plain')
 
+        const projectList = projectState.getProjects()
+
+        const project = projectList.find(project => project.id === projectId)!
+
+        switch(this.type) {
+            case "active":
+                project.status = ProjectStatus.Active
+                break
+            case "finished":
+                project.status = ProjectStatus.Finished
+                break
+        }
+
+        console.log(projectList)
     } 
 
     @AutoBind
@@ -204,7 +227,7 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement>
     configure() {
         this.element.addEventListener('dragover', this.dragOverHandler)
         this.element.addEventListener('dragleave', this.dragLeaveHandler)
-        // this.element.addEventListener('drop', this.dropHandler)
+        this.element.addEventListener('drop', this.dropHandler)
 
         projectState.addListener((projects: Array<Project>) => {
             const relevantProjects = projects.filter(project => {
@@ -243,7 +266,8 @@ class ProjectItem extends Component<HTMLUListElement, HTMLLIElement>
 
     @AutoBind
     dragStartHandler(event: DragEvent) {
-        console.log(event)
+        event.dataTransfer!.setData('text/plain', this.project.id)
+        event.dataTransfer!.effectAllowed = 'move'
     }
     
     dragEndHandler(_: DragEvent) {
