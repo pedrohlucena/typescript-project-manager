@@ -53,14 +53,21 @@ class ProjectState extends State<Project> {
         )
         
         this.projects.push(project)
+        this.updateListeners()
+    }
 
-        for (const listenerFn of this.listeners) {
-            listenerFn(this.projects.slice())
+    moveProjects(projectId: string, newStatus: ProjectStatus) {
+        const project = this.projects.find(project => project.id === projectId)
+        if(project && project.status !== newStatus) {
+            project.status = newStatus
+            this.updateListeners()
         }
     }
 
-    getProjects() {
-        return this.projects
+    private updateListeners() {
+        for (const listenerFn of this.listeners) {
+            listenerFn(this.projects.slice())
+        }
     }
 }
 
@@ -180,21 +187,10 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement>
     @AutoBind
     dropHandler(event: DragEvent) {
         const projectId = event.dataTransfer!.getData('text/plain')
-
-        const projectList = projectState.getProjects()
-
-        const project = projectList.find(project => project.id === projectId)!
-
-        switch(this.type) {
-            case "active":
-                project.status = ProjectStatus.Active
-                break
-            case "finished":
-                project.status = ProjectStatus.Finished
-                break
-        }
-
-        console.log(projectList)
+        projectState.moveProjects(
+            projectId, 
+            this.type === "active" ? ProjectStatus.Active : ProjectStatus.Finished
+        )    
     } 
 
     @AutoBind
