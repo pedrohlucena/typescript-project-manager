@@ -1,4 +1,7 @@
 /// <reference path="../types/user-input.ts" />
+/// <reference path="../utils/validation.ts" />
+/// <reference path="../decorators/autobind.ts" />
+/// <reference path="../state/project-state.ts" />
 
 namespace App {
     export class ProjectInput extends Component<HTMLDivElement, HTMLFormElement> {
