@@ -1,25 +1,25 @@
-/// <reference path="./base-component.ts" />
-/// <reference path="../decorators/autobind.ts" />
-/// <reference path="../state/project-state.ts" />
-/// <reference path="../models/project.ts" />
-/// <reference path="../models/drag-drop.ts" />
+import { DragTarget } from '../models/drag-drop.js'
+import { Component } from './base-component.js'
+import { Project, ProjectStatus } from '../models/project.js'
+import { AutoBind } from '../decorators/autobind.js'
+import { projectState } from '../state/project-state.js'
+import { ProjectItem } from '../components/project-item.js'
 
-namespace App {
-    export class ProjectList extends Component<HTMLDivElement, HTMLElement> 
-    implements DragTarget { 
+export class ProjectList extends Component<HTMLDivElement, HTMLElement>
+    implements DragTarget {
     assignedProjects: Array<Project>
-    
+
     constructor(private type: "active" | "finished") {
         super('project-list', 'app', 'beforeend', `${type}-projects`)
         this.assignedProjects = []
-        
+
         this.configure()
         this.renderContent()
     }
-    
+
     @AutoBind
-    dragOverHandler(event: DragEvent)  {
-        if(event.dataTransfer && event.dataTransfer.types[0] === 'text/plain') {
+    dragOverHandler(event: DragEvent) {
+        if (event.dataTransfer && event.dataTransfer.types[0] === 'text/plain') {
             event.preventDefault()
             const listElement = this.element.querySelector('ul')!
             listElement.classList.add('droppable')
@@ -30,10 +30,10 @@ namespace App {
     dropHandler(event: DragEvent) {
         const projectId = event.dataTransfer!.getData('text/plain')
         projectState.moveProjects(
-            projectId, 
+            projectId,
             this.type === "active" ? ProjectStatus.Active : ProjectStatus.Finished
-        )    
-    } 
+        )
+    }
 
     @AutoBind
     dragLeaveHandler(_: DragEvent) {
@@ -44,22 +44,22 @@ namespace App {
     renderContent() {
         const listId = `${this.type}-projects-list`
         this.element.querySelector('ul')!.id = listId
-        
+
         const projectListTitleElement = this.element.querySelector('h2')!
-        this.type === "active"  
-        ? projectListTitleElement.innerHTML = "Active projects"   
-        : projectListTitleElement.innerHTML = "Finished projects"
+        this.type === "active"
+            ? projectListTitleElement.innerHTML = "Active projects"
+            : projectListTitleElement.innerHTML = "Finished projects"
     }
-    
-    
+
+
     private renderProjects() {
         const listElement = <HTMLUListElement>document.getElementById(`${this.type}-projects-list`)!
 
         listElement.innerHTML = ''
 
-        for(const project of this.assignedProjects) {
+        for (const project of this.assignedProjects) {
             new ProjectItem(this.element.querySelector('ul')!.id, project)
-        } 
+        }
     }
 
     configure() {
@@ -69,7 +69,7 @@ namespace App {
 
         projectState.addListener((projects: Array<Project>) => {
             const relevantProjects = projects.filter(project => {
-                if(this.type === 'active') {
+                if (this.type === 'active') {
                     return project.status === ProjectStatus.Active
                 }
                 return project.status === ProjectStatus.Finished
@@ -79,6 +79,4 @@ namespace App {
             this.renderProjects()
         })
     }
-
-}
 }

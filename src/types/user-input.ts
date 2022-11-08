@@ -1,3 +1,1 @@
-namespace App {
-    export type UserInput = [string, string, number]
-}
+export type UserInput = [string, string, number]
